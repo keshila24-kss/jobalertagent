@@ -48,6 +48,46 @@ def fetch_jobs(url):
     except Exception as e:
         print(f"Error scraping {url}: {e}")
     return jobs
+def main():
+    seen_jobs = load_seen_jobs()
+    new_jobs = []
+
+    for url in URLS:
+        jobs = fetch_jobs(url)
+        for title, link in jobs:
+            if link not in seen_jobs:
+                new_jobs.append((title, link))
+                seen_jobs.add(link)
+
+    # Send email for new jobs
+    if new_jobs:
+        send_email(new_jobs)
+        save_seen_jobs(seen_jobs)
+        print(f"Sent notifications for {len(new_jobs)} new jobs.")
+    else:
+        print("No new jobs found.")
+
+def send_email(jobs):
+    # Compose email content
+    body = ""
+    for title, link in jobs:
+        body += f"{title}\n{link}\n\n"
+
+    msg = MIMEText(body)
+    msg['Subject'] = 'New Job Postings'
+    msg['From'] = EMAIL_ADDRESS
+    msg['To'] = EMAIL_ADDRESS  # or a list of recipients
+
+    try:
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            server.login(EMAIL_ADDRESS, APP_PASSWORD)
+            server.send_message(msg)
+        print("Email sent successfully.")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+
+if __name__ == "__main__":
+    main()
 
 
 
