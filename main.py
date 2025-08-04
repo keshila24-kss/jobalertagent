@@ -43,11 +43,16 @@ def fetch_jobs(url):
             title = a.get_text().strip().lower()
             href = a['href']
             if any(k in title for k in KEYWORDS) and '/jobs/' in href:
-                full_link = href if href.startswith("http") else f"https://jobs.a16z.com{href}"
+                if href.startswith("http"):
+                    full_link = href
+                else:
+                    full_link = f"https://jobs.a16z.com{href}"
                 jobs.append((title, full_link))
     except Exception as e:
         print(f"Error scraping {url}: {e}")
     return jobs
+
+
 def main():
     seen_jobs = load_seen_jobs()
     new_jobs = []
