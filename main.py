@@ -72,4 +72,22 @@ def send_email(jobs):
         print(f"Failed to send email: {e}")
 
 def main():
-    seen
+    seen_jobs = load_seen_jobs()
+    new_jobs = []
+
+    for url in URLS:
+        jobs = fetch_jobs(url)
+        for title, link in jobs:
+            if link not in seen_jobs:
+                new_jobs.append((title, link))
+                seen_jobs.add(link)
+
+    if new_jobs:
+        send_email(new_jobs)
+        save_seen_jobs(seen_jobs)
+        print(f"Sent notifications for {len(new_jobs)} new jobs.")
+    else:
+        print("No new jobs found.")
+
+if __name__ == "__main__":
+    main()
