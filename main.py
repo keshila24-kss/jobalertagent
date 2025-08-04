@@ -76,11 +76,14 @@ def main():
     new_jobs = []
 
     for url in URLS:
-        jobs = fetch_jobs(url)
-        for title, link in jobs:
-            if link not in seen_jobs:
-                new_jobs.append((title, link))
-                seen_jobs.add(link)
+        try:
+            jobs = fetch_jobs(url)
+            for title, link in jobs:
+                if link not in seen_jobs:
+                    new_jobs.append((title, link))
+                    seen_jobs.add(link)
+        except Exception as e:
+            print(f"Error processing {url}: {e}")
 
     if new_jobs:
         send_email(new_jobs)
@@ -88,6 +91,7 @@ def main():
         print(f"Sent notifications for {len(new_jobs)} new jobs.")
     else:
         print("No new jobs found.")
+
 
 if __name__ == "__main__":
     main()
