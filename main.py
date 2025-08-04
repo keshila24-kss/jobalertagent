@@ -39,4 +39,14 @@ def fetch_jobs(url):
     try:
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
+        for a in soup.find_all('a', href=True):
+            title = a.get_text().strip().lower()
+            href = a['href']
+            if any(k in title for k in KEYWORDS) and '/jobs/' in href:
+                full_link = href if href.startswith("http") else f"https://jobs.a16z.com{href}"
+                jobs.append((title, full_link))
+    except Exception as e:
+        print(f"Error scraping {url}: {e}")
+    return jobs
+
 
